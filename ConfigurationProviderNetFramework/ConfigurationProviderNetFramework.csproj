@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="ConfigurationProviderBase.cs" />
     <Compile Include="DbConnectionInformation.cs" />
     <Compile Include="Program.cs" />

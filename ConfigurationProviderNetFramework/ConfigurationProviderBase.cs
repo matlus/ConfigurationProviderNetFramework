@@ -48,7 +48,9 @@ namespace ConfigurationProviderNetFramework
         {
             get
             {
-                return GetConfigurationSettingValue("Behavior:VideoReceiveQueueBrokeredMessagePublisher");
+                var paymentGatewayServiceUrlAsConfigured = GetConfigurationSettingValueThrowIfNotFound("PaymentGatewayServiceUrl");
+                return !paymentGatewayServiceUrlAsConfigured.EndsWith("/", StringComparison.OrdinalIgnoreCase) ? paymentGatewayServiceUrlAsConfigured + "/" : paymentGatewayServiceUrlAsConfigured;
+
             }
         }
 
@@ -63,7 +65,7 @@ namespace ConfigurationProviderNetFramework
         {
             get
             {
-                var fiscalYearStartAsConfigured = GetConfigurationSettingValue("FicalYearStartDate");
+                var fiscalYearStartAsConfigured = GetConfigurationSettingValue("FiscalYearStart");
                 DateTime fiscalYear = EnsureConfiguredFiscalYearStartIsValidDate(fiscalYearStartAsConfigured);
                 return new DateTime(1, fiscalYear.Month, fiscalYear.Day);
             }
@@ -95,7 +97,7 @@ namespace ConfigurationProviderNetFramework
 
             return bool.TryParse(notifyOnUploadAsConfigured, out var notifyOnUpload)
                 ? notifyOnUpload
-                : throw new ConfigurationErrorsException($"The NotifyOnUpload configuration setting value of: {notifyOnUploadAsConfigured}, is not a valid Boolean. This property is expected to be parseable to a Boolean value. Possible values are \"true\" or \"false\"");
+                : throw new ConfigurationErrorsException($"The NotifyOnUpload configuration setting value of: {notifyOnUploadAsConfigured}, is not a valid Boolean. This property is expected to be parseable to a Boolean value. Possible values are \"True\" or \"False\"");
         }
 
         /// <summary>
