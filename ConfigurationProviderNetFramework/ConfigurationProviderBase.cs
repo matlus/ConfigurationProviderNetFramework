@@ -125,7 +125,7 @@ namespace ConfigurationProviderNetFramework
 
             return DateTime.TryParse(fiscalYearStartAsConfigured, out var fiscalYearStart)
                 ? fiscalYearStart
-                : throw new ConfigurationErrorsException($"The FicalYearStartDate configuration setting value of: {fiscalYearStartAsConfigured}, is not a valid DateTime. This property is expected to be Valid parseable DateTime");
+                : throw new ConfigurationErrorsException($"The FiscalYearStartDate configuration setting value of: {fiscalYearStartAsConfigured}, is not a valid DateTime. This property is expected to be Valid parseable DateTime");
         }
 
         protected static void EnsureConfigSettingIsPresent(string configurationValue, Func<ConfigurationSettingState, Exception> exceptionCallback)
