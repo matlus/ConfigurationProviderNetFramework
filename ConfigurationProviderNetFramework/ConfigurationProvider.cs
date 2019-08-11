@@ -9,8 +9,6 @@ namespace ConfigurationProviderNetFramework
 {
     internal sealed class ConfigurationProvider : ConfigurationProviderBase
     {
-        private enum ConfigurationSettingState { IsNull, IsWhiteSpaces, IsEmpty, IsPresent }
-
         protected override string GetConfigurationSettingValue(string configurationSettingKey)
         {
             return ConfigurationManager.AppSettings[configurationSettingKey];
@@ -20,7 +18,7 @@ namespace ConfigurationProviderNetFramework
         {
             var valueAsConfigured = GetConfigurationSettingValue(configurationSettingKey);
 
-            EnsureConfigSettingIsPresentThrowIfNot(valueAsConfigured, configurationSettingState =>
+            EnsureConfigSettingIsPresent(valueAsConfigured, configurationSettingState =>
             {
                 switch (configurationSettingState)
                 {
@@ -47,47 +45,12 @@ namespace ConfigurationProviderNetFramework
             }
 
             var connectionString = connectionStringSection.ConnectionString;
+            EnsureConnectionStringIsPresent(connectionStringName, connectionString);
 
-            EnsureConfigSettingIsPresentThrowIfNot(connectionString, configurationSettingState =>
-            {
-                switch (configurationSettingState)
-                {
-                    case ConfigurationSettingState.IsWhiteSpaces:
-                        return new ConfigurationErrorsException($"The value of the ConnectionString setting with the Name: {connectionStringName} is Blank (only spaces). This setting is a Required setting");
-                    case ConfigurationSettingState.IsEmpty:
-                    default:
-                        return new ConfigurationErrorsException($"The value of the ConnectionString setting with the Name: {connectionStringName} is Empty. This setting is a Required setting");
-                }
-            });
+            var providerName = connectionStringSection.ProviderName;
+            EnsureProviderNameIsPresent(connectionStringName, providerName);
 
             return new DbConnectionInformation(connectionStringName, connectionString, connectionStringSection.ProviderName);
-
-        }
-
-        private static void EnsureConfigSettingIsPresentThrowIfNot(string configurationValue, Func<ConfigurationSettingState, Exception> exceptionCallback)
-        {
-            var configurationSettingState = ConfigurationSettingState.IsPresent;
-
-            if (string.IsNullOrWhiteSpace(configurationValue))
-            {
-                if (configurationValue == null)
-                {
-                    configurationSettingState = ConfigurationSettingState.IsNull;
-                }
-                else
-                {
-                    configurationSettingState = ConfigurationSettingState.IsWhiteSpaces;                    
-                }
-            }
-            else if (configurationValue.Length == 0)
-            {
-                configurationSettingState = ConfigurationSettingState.IsEmpty;
-            }
-
-            if (configurationSettingState != ConfigurationSettingState.IsPresent)
-            {
-                throw exceptionCallback(configurationSettingState);
-            }
         }
     }    
 }

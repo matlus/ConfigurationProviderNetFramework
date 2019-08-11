@@ -13,13 +13,13 @@ namespace ConfigurationProviderNetFramework
     {
         public string ConnectionStringName { get; }
         public string ConnectionString { get; }
-        public string ProviderInvariantName { get; }
+        public string ProviderName { get; }
 
-        public DbConnectionInformation(string connectionStringName, string connectionString, string providerInvariantName)
+        public DbConnectionInformation(string connectionStringName, string connectionString, string providerName)
         {
             ConnectionStringName = connectionStringName;
             ConnectionString = connectionString;
-            ProviderInvariantName = providerInvariantName;
+            ProviderName = providerName;
         }
     }
 }

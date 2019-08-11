@@ -21,6 +21,8 @@ namespace ConfigurationProviderNetFramework
     /// </summary>
     internal abstract class ConfigurationProviderBase
     {
+        protected enum ConfigurationSettingState { IsNull, IsWhiteSpaces, IsEmpty, IsPresent }
+
         /// <summary>
         /// The EmailTemplatesPath is essentially a portion of a Directory Path
         /// The application has a notion of a "Root Folder or Diretory" and the 
@@ -124,6 +126,62 @@ namespace ConfigurationProviderNetFramework
             return DateTime.TryParse(fiscalYearStartAsConfigured, out var fiscalYearStart)
                 ? fiscalYearStart
                 : throw new ConfigurationErrorsException($"The FicalYearStartDate configuration setting value of: {fiscalYearStartAsConfigured}, is not a valid DateTime. This property is expected to be Valid parseable DateTime");
+        }
+
+        protected static void EnsureConfigSettingIsPresent(string configurationValue, Func<ConfigurationSettingState, Exception> exceptionCallback)
+        {
+            var configurationSettingState = ConfigurationSettingState.IsPresent;
+
+            if (string.IsNullOrWhiteSpace(configurationValue))
+            {
+                if (configurationValue == null)
+                {
+                    configurationSettingState = ConfigurationSettingState.IsNull;
+                }
+                else
+                {
+                    configurationSettingState = ConfigurationSettingState.IsWhiteSpaces;
+                }
+            }
+            else if (configurationValue.Length == 0)
+            {
+                configurationSettingState = ConfigurationSettingState.IsEmpty;
+            }
+
+            if (configurationSettingState != ConfigurationSettingState.IsPresent)
+            {
+                throw exceptionCallback(configurationSettingState);
+            }
+        }
+
+        protected static void EnsureProviderNameIsPresent(string connectionStringName, string providerName)
+        {
+            EnsureConfigSettingIsPresent(providerName, configurationSettingState =>
+            {
+                switch (configurationSettingState)
+                {
+                    case ConfigurationSettingState.IsWhiteSpaces:
+                        return new ConfigurationErrorsException($"The value of the providerName attribute for ConnectionString setting Name: {connectionStringName} is Blank (only spaces). This setting is a Required setting");
+                    case ConfigurationSettingState.IsEmpty:
+                    default:
+                        return new ConfigurationErrorsException($"The value of the providerName attribute for ConnectionString setting Name: {connectionStringName} is Empty. This setting is a Required setting");
+                }
+            });
+        }
+
+        protected static void EnsureConnectionStringIsPresent(string connectionStringName, string connectionString)
+        {
+            EnsureConfigSettingIsPresent(connectionString, configurationSettingState =>
+            {
+                switch (configurationSettingState)
+                {
+                    case ConfigurationSettingState.IsWhiteSpaces:
+                        return new ConfigurationErrorsException($"The value of the connectionString attribute for ConnectionString setting Name: {connectionStringName} is Blank (only spaces). This setting is a Required setting");
+                    case ConfigurationSettingState.IsEmpty:
+                    default:
+                        return new ConfigurationErrorsException($"The value of the connectionString attribute for ConnectionString setting Name: {connectionStringName} is Empty. This setting is a Required setting");
+                }
+            });
         }
 
         /// <summary>
