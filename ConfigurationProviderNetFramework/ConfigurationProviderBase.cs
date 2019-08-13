@@ -132,26 +132,36 @@ namespace ConfigurationProviderNetFramework
         {
             var configurationSettingState = ConfigurationSettingState.IsPresent;
 
-            if (string.IsNullOrWhiteSpace(configurationValue))
+            if (configurationValue == null)
             {
-                if (configurationValue == null)
-                {
-                    configurationSettingState = ConfigurationSettingState.IsNull;
-                }
-                else
-                {
-                    configurationSettingState = ConfigurationSettingState.IsWhiteSpaces;
-                }
+                configurationSettingState = ConfigurationSettingState.IsNull;
             }
             else if (configurationValue.Length == 0)
             {
                 configurationSettingState = ConfigurationSettingState.IsEmpty;
+            }
+            else if (IsWhiteSpaces(configurationValue))
+            {
+                configurationSettingState = ConfigurationSettingState.IsWhiteSpaces;
             }
 
             if (configurationSettingState != ConfigurationSettingState.IsPresent)
             {
                 throw exceptionCallback(configurationSettingState);
             }
+        }
+
+        private static bool IsWhiteSpaces(string value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (Char.IsWhiteSpace(value[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected static void EnsureProviderNameIsPresent(string connectionStringName, string providerName)
