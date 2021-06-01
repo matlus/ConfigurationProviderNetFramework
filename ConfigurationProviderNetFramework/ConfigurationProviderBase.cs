@@ -25,7 +25,7 @@ namespace ConfigurationProviderNetFramework
 
         /// <summary>
         /// The EmailTemplatesPath is essentially a portion of a Directory Path
-        /// The application has a notion of a "Root Folder or Diretory" and the 
+        /// The application has a notion of a "Root Folder or Directory" and the 
         /// EmailTemplatesPath (folder) hangs off of that
         /// This Property returns the EmailTemplatesPath as configured 
         /// This property is Required (Not Optional)
